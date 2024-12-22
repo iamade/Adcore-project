@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from pymongo import UpdateOne
 from app.routes import payments, evidence
 from app.utils.csv_normalizer import normalize_csv
 from app.database.database import payments_collection, evidence_collection, client, close_mongo_connection
@@ -39,19 +40,36 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
+        # Normalize the CSV data
         normalized_data = normalize_csv(csv_file_path)
 
-        # Perfrom upsert for each record
+        # Prepare bulk upsert operations
+        bulk_operations = []
         for payment in normalized_data:
             # Convert datetime.date to datetime.datetime
             if isinstance(payment["payee_due_date"], date):
                 payment["payee_due_date"] = datetime.combine(payment["payee_due_date"], datetime.min.time())
 
+            # Ensure phone number and postal code are strings
+            payment["payee_phone_number"] = str(payment["payee_phone_number"])
+            payment["payee_postal_code"] = str(payment["payee_postal_code"])
+
+            # Prepare bulk upsert operation
             filter_query = {"payee_email": payment["payee_email"]}
             update_query = {"$set": payment}
+            bulk_operations.append(
+                UpdateOne(filter_query, update_query, upsert=True)
+            )
 
-            await payments_collection.update_one(filter_query, update_query, upsert=True)
-        logger.info(f"✅ Upserted {len(normalized_data)} records into MongoDB.")
+        # Perform bulk upsert if there are records
+        if bulk_operations:
+            result = await payments_collection.bulk_write(bulk_operations)
+            logger.info(
+                f"✅ Upserted {result.upserted_count} new records, {result.modified_count} modified records."
+            )
+        else:
+            logger.info("⚠️ No records to upsert.")
+
         yield
 
     finally:
@@ -59,33 +77,32 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+
 # @asynccontextmanager
 # async def lifespan(app: FastAPI):
-#     # await connect_to_mongo()
-#
-#     # Ensure the collection is initialized
-#     # if not payments_collection or not evidence_collection:
-#     #     logger.error("❌ MongoDB connection failed. Collection is not initialized.")
-#     #     return
-#
-#     # Load and upsert normalized data
 #     try:
-#         await connect_to_mongo()
+#         normalized_data = normalize_csv(csv_file_path)
 #
-#         # Insert Csv data if collection is empty
-#         # await insert_normalized_data()
+#         # Perfrom upsert for each record
+#         for payment in normalized_data:
+#             # Convert datetime.date to datetime.datetime
+#             if isinstance(payment["payee_due_date"], date):
+#                 payment["payee_due_date"] = datetime.combine(payment["payee_due_date"], datetime.min.time())
 #
-#         logger.info("✅ MongoDB connected and initialized.")
+#             payment["payee_phone_number"] = str(payment["payee_phone_number"])
+#             payment["payee_postal_code"] = str(payment["payee_postal_code"])
+#             filter_query = {"payee_email": payment["payee_email"]}
+#             update_query = {"$set": payment}
+#
+#             await payments_collection.update_one(filter_query, update_query, upsert=True)
+#         logger.info(f"✅ Upserted {len(normalized_data)} records into MongoDB.")
 #         yield
 #
 #     finally:
-#         # Shutdown - Close MongoDB Connection
-#         if client:
-#             client.close()
-#             logger.info(f"❌ Closed MongoDB collection")
-#
+#         await close_mongo_connection()
 #
 # app = FastAPI(lifespan=lifespan)
+
 
 app.include_router(payments.router, prefix="/api/payments", tags=["Payments"])
 app.include_router(evidence.router, prefix="/api/evidence", tags=["Evidence"])

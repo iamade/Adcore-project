@@ -22,13 +22,13 @@ class PaymentCreate(BaseModel):
     discount_percent: Optional[float]
     tax_percent: Optional[float]
     due_amount: float
-    total_due: Optional[float]
 
 
 
 # Schema for Payment (Response)
 class PaymentResponse(PaymentCreate):
     id: str
+    total_due: float
 
 # Payment Update Schema (Partial Updates with Optional Fields)
 class PaymentUpdate(BaseModel):
@@ -47,7 +47,6 @@ class PaymentUpdate(BaseModel):
     discount_percent: Optional[float]
     tax_percent: Optional[float]
     due_amount: Optional[float]
-    total_due: Optional[float]
 
 
 # Schema for Evidence (Upload and Download)

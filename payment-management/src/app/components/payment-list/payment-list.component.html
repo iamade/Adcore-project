@@ -1,0 +1,55 @@
+<div class="search-bar">
+    <mat-form-field appearance="outline">
+      <mat-label>Search Payments</mat-label>
+      <input matInput (keyup)="searchPayments(searchTerm)" [(ngModel)]="searchTerm" placeholder="Enter payee name or email">
+    </mat-form-field>
+  </div>
+  
+  <table mat-table [dataSource]="payments" class="mat-elevation-z8">
+    <ng-container matColumnDef="payee_first_name">
+      <th mat-header-cell *matHeaderCellDef> First Name </th>
+      <td mat-cell *matCellDef="let payment"> {{ payment.payee_first_name }} </td>
+    </ng-container>
+  
+    <ng-container matColumnDef="payee_last_name">
+      <th mat-header-cell *matHeaderCellDef> Last Name </th>
+      <td mat-cell *matCellDef="let payment"> {{ payment.payee_last_name }} </td>
+    </ng-container>
+  
+    <ng-container matColumnDef="total_due">
+      <th mat-header-cell *matHeaderCellDef> Total Due </th>
+      <td mat-cell *matCellDef="let payment"> {{ payment.total_due | currency }} </td>
+    </ng-container>
+  
+    <tr mat-header-row *matHeaderRowDef="['payee_first_name', 'payee_last_name', 'total_due']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['payee_first_name', 'payee_last_name', 'total_due'];"></tr>
+  </table>
+  
+  
+
+<!-- <p-table [value]="payments" [paginator]="true" [rows]="10" [lazy]="true" (onLazyLoad)="loadPayments($event)">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Status</th>
+        <th>Due Amount</th>
+        <th>Total Due</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-payment>
+      <tr>
+        <td>{{ payment.payee_first_name }}</td>
+        <td>{{ payment.payee_last_name }}</td>
+        <td>{{ payment.payee_payment_status }}</td>
+        <td>{{ payment.due_amount | currency }}</td>
+        <td>{{ payment.total_due | currency }}</td>
+        <td>
+          <button pButton label="Edit" icon="pi pi-pencil" (click)="editPayment(payment)"></button>
+          <button pButton label="Delete" icon="pi pi-trash" class="p-button-danger" (click)="deletePayment(payment.id)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+   -->
