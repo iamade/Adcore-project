@@ -1,1 +1,50 @@
-<p>payment-add works!</p>
+<h2>Add New Payment</h2>
+<form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+  <mat-form-field appearance="outline">
+    <mat-label>First Name</mat-label>
+    <input matInput formControlName="payee_first_name" required>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Last Name</mat-label>
+    <input matInput formControlName="payee_last_name" required>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Email</mat-label>
+    <input matInput type="email" formControlName="payee_email" required>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Phone Number</mat-label>
+    <input matInput formControlName="payee_phone_number" required>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Due Date</mat-label>
+    <input matInput [matDatepicker]="picker" formControlName="payee_due_date" required>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Amount Due</mat-label>
+    <input matInput type="number" formControlName="due_amount" required>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Payment Status</mat-label>
+    <mat-select formControlName="payee_payment_status" required>
+      <mat-option value="pending">Pending</mat-option>
+      <mat-option value="due_now">Due Now</mat-option>
+      <mat-option value="completed">Completed</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Currency</mat-label>
+    <input matInput formControlName="currency" required>
+  </mat-form-field>
+
+  <button mat-raised-button color="primary" type="submit" [disabled]="paymentForm.invalid">Add Payment</button>
+</form>

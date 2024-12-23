@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from pymongo import UpdateOne
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.routes import payments, evidence
 from app.utils.csv_normalizer import normalize_csv
 from app.database.database import payments_collection, evidence_collection, client, close_mongo_connection
@@ -17,24 +19,6 @@ csv_file_path = os.path.join(os.path.dirname(__file__), "app/data/payment_inform
 # Configure logging
 logging .basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# async def insert_normalized_data():
-#     await payments_collection.insert_one({
-#         "payee_email": "placeholder@example.com",
-#         "amount": 0,
-#         "status": "placeholder"
-#     })
-#     logger.info("🟩 Inserted placeholder record to initialize collection.")
-#     # Check if collection is empty
-#     count = await payments_collection.count_documents({})
-#
-#     if count == 0:
-#         normalized_data = normalize_csv(csv_file_path)
-#         if normalized_data:
-#             await payments_collection.insert_many(normalized_data)
-#             logger.info(f"✅ Inserted {len(normalized_data)} normalized records into MongoDB.")
-#         else:
-#             logger.info("⚠️ No records to insert.")
 
 
 @asynccontextmanager
@@ -77,34 +61,22 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 
+# Allow specific origins (localhost:4200 for Angular)
+origins = [
+    "http://localhost:4200",
+    "http://127.0.0.1:4200"
+]
 
-# @asynccontextmanager
-# async def lifespan(app: FastAPI):
-#     try:
-#         normalized_data = normalize_csv(csv_file_path)
-#
-#         # Perfrom upsert for each record
-#         for payment in normalized_data:
-#             # Convert datetime.date to datetime.datetime
-#             if isinstance(payment["payee_due_date"], date):
-#                 payment["payee_due_date"] = datetime.combine(payment["payee_due_date"], datetime.min.time())
-#
-#             payment["payee_phone_number"] = str(payment["payee_phone_number"])
-#             payment["payee_postal_code"] = str(payment["payee_postal_code"])
-#             filter_query = {"payee_email": payment["payee_email"]}
-#             update_query = {"$set": payment}
-#
-#             await payments_collection.update_one(filter_query, update_query, upsert=True)
-#         logger.info(f"✅ Upserted {len(normalized_data)} records into MongoDB.")
-#         yield
-#
-#     finally:
-#         await close_mongo_connection()
-#
-# app = FastAPI(lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, DELETE)
+    allow_headers=["*"],  # Allow all headers
+)
 
 
-app.include_router(payments.router, prefix="/api/payments", tags=["Payments"])
+app.include_router(payments.router, prefix="/api", tags=["Payments"])
 app.include_router(evidence.router, prefix="/api/evidence", tags=["Evidence"])
 
 
