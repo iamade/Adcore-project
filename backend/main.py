@@ -62,14 +62,14 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 # Allow specific origins (localhost:4200 for Angular)
-origins = [
-    "http://localhost:4200",
-    "http://127.0.0.1:4200"
-]
+# origins = [
+#     "http://localhost:4200",
+#     "http://127.0.0.1:4200"
+# ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],  # Allow all HTTP methods (GET, POST, PUT, DELETE)
     allow_headers=["*"],  # Allow all headers

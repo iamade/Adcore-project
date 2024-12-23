@@ -1,4 +1,114 @@
 <h2>Edit Payment</h2>
+
+<!-- Display Form Validation Status -->
+<div *ngIf="paymentForm.invalid">
+  <p style="color: red"><strong>Some fields are invalid. Please check below:</strong></p>
+</div>
+
+<form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+  <!-- Payee Due Date -->
+  <mat-form-field appearance="outline">
+    <mat-label>Due Date</mat-label>
+    <input matInput [matDatepicker]="picker" formControlName="payee_due_date" required>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+    <div *ngIf="paymentForm.get('payee_due_date')?.invalid">
+      <p style="color: red">Due Date is invalid - {{ paymentForm.get('payee_due_date')?.errors | json }}</p>
+    </div>
+  </mat-form-field>
+
+  <!-- Amount Due -->
+  <mat-form-field appearance="outline">
+    <mat-label>Amount Due</mat-label>
+    <input matInput type="number" formControlName="due_amount" required>
+    <div *ngIf="paymentForm.get('due_amount')?.invalid">
+      <p style="color: red">Amount is invalid - {{ paymentForm.get('due_amount')?.errors | json }}</p>
+    </div>
+  </mat-form-field>
+
+  <!-- Payment Status -->
+  <mat-form-field appearance="outline">
+    <mat-label>Payment Status</mat-label>
+    <mat-select formControlName="payee_payment_status" required>
+      <mat-option value="pending">Pending</mat-option>
+      <mat-option value="due_now">Due Now</mat-option>
+      <mat-option value="completed">Completed</mat-option>
+    </mat-select>
+    <div *ngIf="paymentForm.get('payee_payment_status')?.invalid">
+      <p style="color: red">Payment Status is invalid - {{ paymentForm.get('payee_payment_status')?.errors | json }}</p>
+    </div>
+  </mat-form-field>
+
+  <!-- Address Line 2 -->
+  <mat-form-field appearance="outline">
+    <mat-label>Address Line 2</mat-label>
+    <input matInput formControlName="payee_address_line_2">
+  </mat-form-field>
+
+  <!-- Country -->
+  <mat-form-field appearance="outline">
+    <mat-label>Country</mat-label>
+    <input matInput formControlName="payee_country" required>
+    <div *ngIf="paymentForm.get('payee_country')?.invalid">
+      <p style="color: red">Country is invalid - {{ paymentForm.get('payee_country')?.errors | json }}</p>
+    </div>
+  </mat-form-field>
+
+  <!-- Province/State -->
+  <mat-form-field appearance="outline">
+    <mat-label>Province/State</mat-label>
+    <input matInput formControlName="payee_province_or_state">
+  </mat-form-field>
+
+  <!-- Phone Number -->
+  <mat-form-field appearance="outline">
+    <mat-label>Phone Number</mat-label>
+    <input matInput formControlName="payee_phone_number" required placeholder="+1234567890">
+    <div *ngIf="paymentForm.get('payee_phone_number')?.invalid">
+      <p style="color: red">Phone Number is invalid - {{ paymentForm.get('payee_phone_number')?.errors | json }}</p>
+    </div>
+  </mat-form-field>
+
+  <!-- Currency -->
+  <mat-form-field appearance="outline">
+    <mat-label>Currency</mat-label>
+    <input matInput formControlName="currency" required>
+    <div *ngIf="paymentForm.get('currency')?.invalid">
+      <p style="color: red">Currency is invalid - {{ paymentForm.get('currency')?.errors | json }}</p>
+    </div>
+  </mat-form-field>
+
+  <!-- Discount Percent -->
+  <mat-form-field appearance="outline">
+    <mat-label>Discount Percent</mat-label>
+    <input matInput type="number" formControlName="discount_percent" min="0" max="100">
+    <div *ngIf="paymentForm.get('discount_percent')?.invalid">
+      <p style="color: red">Discount is invalid - {{ paymentForm.get('discount_percent')?.errors | json }}</p>
+    </div>
+  </mat-form-field>
+
+  <!-- Tax Percent -->
+  <mat-form-field appearance="outline">
+    <mat-label>Tax Percent</mat-label>
+    <input matInput type="number" formControlName="tax_percent" min="0" max="100">
+    <div *ngIf="paymentForm.get('tax_percent')?.invalid">
+      <p style="color: red">Tax Percent is invalid - {{ paymentForm.get('tax_percent')?.errors | json }}</p>
+    </div>
+  </mat-form-field>
+
+  <!-- Submit Button -->
+  <button mat-raised-button color="primary" type="submit" [disabled]="paymentForm.invalid">
+    Save Changes
+  </button>
+</form>
+
+<!-- Form Status Summary -->
+<!-- <h3>Form Status Summary</h3>
+<p>Form Status: <strong>{{ paymentForm.status }}</strong></p> -->
+
+
+<!-- <h2>Edit Payment</h2>
+
 <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
   <mat-form-field appearance="outline">
     <mat-label>First Name</mat-label>
@@ -88,6 +198,8 @@
 
   <button mat-raised-button color="primary" type="submit" [disabled]="paymentForm.invalid">Save Changes</button>
 </form>
+ -->
+
 
 
 <!-- <h2>Edit Payment</h2>
